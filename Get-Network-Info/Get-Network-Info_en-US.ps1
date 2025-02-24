@@ -50,5 +50,5 @@ Get-NetTCPConnection | Out-File -FilePath $outpath -Append
 
 Post-File
 
-Clear-History
 Remove-Item -Path $outpath -Force
+Clear-History
